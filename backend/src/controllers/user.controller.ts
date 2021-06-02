@@ -11,6 +11,7 @@ export async function createUser (req: any, res: Response){
     let newUser = new User();
     newUser.username = username;
     newUser.password = password;
+    newUser._id = new mongoose.Types.ObjectId();
     newUser.fullname = '';
     newUser.description = '';
     newUser.university = '';

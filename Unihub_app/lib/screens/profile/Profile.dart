@@ -63,7 +63,7 @@ class Profile extends State<ProfileScreen> {
                     IconButton(
                         icon: Icon(Icons.settings),
                         onPressed: () {
-                          //Nos lleva a settings
+                          Navigator.of(context).pushNamed('/sugerencias');
                         }),
                     IconButton(
                         icon: Icon(Icons.logout),
