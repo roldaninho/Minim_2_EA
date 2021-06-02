@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {createUser, loginUser, deleteUser, getUsers,/*, getAdmin*/
 updateUser, getUser, getAdmin, getUniversities, getDegrees, getSubjects, updateFollowers, getUserImage} from '../controllers/user.controller'
 import { getOffer, getOffers, updateOffer, deleteOffer, createOffer, updateBuys, updateLikesOffer, getAllOffers} from '../controllers/offer.controller'
-import { getFeed, getFeeds, updateFeed, deleteFeed, createFeed, updateLikesFeed, getAllFeeds } from '../controllers/feedPublication.controller'
+import { getFeed, getFeeds, updateFeed, deleteFeed, createFeed, updateLikesFeed, getAllFeeds, createSugerencia, deleteSugerencia, getSugerencia, getSugerencias, getAllSugerencias, updateSugerencia } from '../controllers/feedPublication.controller'
 import { createComment, deleteComment, getComments, updateComment, updateLikesComment } from '../controllers/comments.controller';
 
 const router = Router();
@@ -51,6 +51,21 @@ router.route('/Feed/getAllFeeds').get(getAllFeeds);
 router.route('/Feed/updateFeed').post(updateFeed);
 
 router.route('/User/getUserImage/:username').get(getUserImage);
+
+//Sugerencia Crud
+
+router.route('/Sugerencia/newSugerencia').post(createSugerencia);
+
+router.route('/Sugerencia/deleteSugerencia/:id').delete(deleteSugerencia);
+
+router.route('/Sugerencia/getSugerencia/:username').get(getSugerencia);
+
+router.route('/Sugerencia/getSugerencias').post(getSugerencias);
+
+router.route('/Sugerencia/getAllSugerencias').get(getAllSugerencias);
+
+router.route('/Sugerencia/updateSugerencia').post(updateSugerencia);
+
 
 //Get Universities/Faculties/Degrees/Subjects
 

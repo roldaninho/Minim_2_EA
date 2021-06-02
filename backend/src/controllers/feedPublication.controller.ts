@@ -1,6 +1,7 @@
 import {Request, Response} from 'express'
 import User from '../models/User'
 import FeedPublication from '../models/feedPublication'
+import SugerenciaPublication from '../models/sugerencia'
 
 import jwt from 'jsonwebtoken'
 
@@ -35,6 +36,36 @@ export async function createFeed (req: any, res: Response){
 
 }
 
+export async function createSugerencia (req: any, res: Response){
+    const Btoken = req.headers['authorization'];
+
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+                let {content, username, date} = req.body;
+                let newSugerencia = new SugerenciaPublication();
+                newSugerencia.content= content;
+                newSugerencia.publicationDate= date;
+                newSugerencia.username=username;
+                newSugerencia.likes= [];
+                newSugerencia.comments= [];
+                try{
+                    let sugerenciaMod = await newSugerencia.save();
+                    return res.status(200).header('Content Type - application/json').send(sugerenciaMod);
+                } catch {
+                    return res.status(500).send({message: "Internal server error"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+
+}
+
 export async function deleteFeed (req: any, res: Response){
     const Btoken = req.headers['authorization'];
 
@@ -47,6 +78,28 @@ export async function deleteFeed (req: any, res: Response){
                 try{
                     await FeedPublication.findOneAndRemove({_id: req.params.id});
                     return res.status(200).send({message: "Feed correctly deleted"});
+                } catch {
+                    return res.status(500).send({message: "Internal server error"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+}
+
+export async function deleteSugerencia (req: any, res: Response){
+    const Btoken = req.headers['authorization'];
+
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+                try{
+                    await SugerenciaPublication.findOneAndRemove({_id: req.params.id});
+                    return res.status(200).send({message: "Suggeriment correctly deleted"});
                 } catch {
                     return res.status(500).send({message: "Internal server error"});
                 }
@@ -91,6 +144,40 @@ export async function getFeed (req: any, res: Response){
 
 }
 
+
+export async function getSugerencia (req: any, res: Response){
+    const Btoken = req.headers['authorization'];
+    let username= req.params.username;
+
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+                const userfound = await User.findOne({username: username});
+                try{
+                    if(userfound != null){
+                        const sugerencias = await SugerenciaPublication.find({username: username})
+                        if (sugerencias!=null){
+                            return res.status(200).header('Content Type - application/json').send(sugerencias);
+                        }else
+                        return res.status(204).send({message: "U have no suggeriments my dear"});
+            
+                    } else {
+                        return res.status(404).send({message: "User not found"});
+                    }
+                } catch {
+                    return res.status(500).send({message: "Internal server error"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+
+
+}
 
 export async function getFeeds (req: any, res: Response){
     const Btoken = req.headers['authorization'];
@@ -138,6 +225,53 @@ export async function getFeeds (req: any, res: Response){
 
 }
 
+
+export async function getSugerencias (req: any, res: Response){
+    const Btoken = req.headers['authorization'];
+    var following = req.body;
+    const sugerencias: any[]=[];
+    
+
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+
+                try{
+                    let cont= 0
+                    while(cont<following.length){
+                        let username= following[cont]
+                        var sugerencia= await SugerenciaPublication.find({username: username})
+                        if (sugerencia!= null){
+                            let cont2= 0
+                            while(cont2<sugerencia.length){
+                                sugerencias.push(sugerencia[cont2])
+                                cont2++
+                            }
+
+                        }
+                        cont++
+                    }
+                    
+
+                    if (sugerencias.length !=0){
+                        return res.status(200).header('Content Type - application/json').send(sugerencias);
+
+                    }else
+                        return res.status(404).send({message: "Your friends haven't posted anyt suggeriment yet"});
+                } catch {
+                    return res.status(500).send({message: "Internal server error"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+
+}
+
 export async function getAllFeeds (req: any, res: Response){
     const Btoken = req.headers['authorization'];
     if(typeof Btoken !== undefined){
@@ -152,6 +286,30 @@ export async function getAllFeeds (req: any, res: Response){
                             return res.status(200).header('Content Type - application/json').send(feeds);
                         }else
                             return res.status(204).send({message: "There aren't any feeds my dear"});
+                } catch {
+                    return res.status(500).send({message: "Internal server error"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+}
+
+export async function getAllSugerencias (req: any, res: Response){
+    const Btoken = req.headers['authorization'];
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+                try{
+                        const sugerencias = await SugerenciaPublication.find();
+                        if (sugerencias!=null){
+                            return res.status(200).header('Content Type - application/json').send(sugerencias);
+                        }else
+                            return res.status(204).send({message: "There aren't any suggeriments my dear"});
                 } catch {
                     return res.status(500).send({message: "Internal server error"});
                 }
@@ -189,6 +347,33 @@ export async function updateFeed (req: any, res: Response){
 
 }
 
+export async function updateSugerencia (req: any, res: Response){
+    let{username, Content } = req.body;
+    const Btoken = req.headers['authorization'];
+    const updateData = {
+        content: Content,
+    }
+
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+                try {
+                    await User.findOneAndUpdate({username: username}, updateData);
+                    return res.status(200).send({message: 'Suggeriment correctly updated'});
+                } catch {
+                    return res.status(201).send({message: "Suggeriment couldn't be updated"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+
+}
+
 export async function updateLikesFeed (req: any, res: Response){
     let{username, _id} = req.body;
     const Btoken = req.headers['authorization'];
@@ -215,6 +400,41 @@ export async function updateLikesFeed (req: any, res: Response){
                     }
                 } catch {
                     return res.status(201).send({message: "FeedLikes couldn't be updated"});
+                }
+            }
+        });
+    } else {
+        return res.status(204).send({message: 'Unauthorized'});
+    }
+
+}
+
+export async function updateLikesSugerencia (req: any, res: Response){
+    let{username, _id} = req.body;
+    const Btoken = req.headers['authorization'];
+    const action = req.params.action;
+
+
+    if(typeof Btoken !== undefined){
+        req.token = Btoken;
+        jwt.verify(req.token, 'mykey', async(error: any, authData: any) => {
+            if(error){
+                return res.status(205).send({message: 'Authorization error'});
+            } else {
+                try {
+                    const sugerencia = await SugerenciaPublication.findById({_id: _id});
+                    let liking = sugerencia?.likes
+                    if (action=='add'){
+                        liking?.push(username)
+                        await SugerenciaPublication.findByIdAndUpdate({_id: _id}, {likes: liking})
+                        return res.status(200).send({message: 'Suggeriment Likes correctly updated'});
+                    }else{
+                        liking?.splice(liking?.findIndex(findUsername),1);
+                        await SugerenciaPublication.findByIdAndUpdate({_id: _id}, {likes: liking})
+                        return res.status(200).send({message: 'Suggeriment Likes correctly updated'});
+                    }
+                } catch {
+                    return res.status(201).send({message: "Suggeriment Likes couldn't be updated"});
                 }
             }
         });

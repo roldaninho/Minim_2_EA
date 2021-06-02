@@ -13,13 +13,36 @@ class FeedController {
     return response;
   }
 
+  Future<dynamic> createSugerenciaPub(
+      String username, String content, String date) async {
+    var body = {'username': username, 'content': content, 'date': date};
+    print(body);
+    final http.Response response =
+        await _helper.post('/Sugerencia/newSugerencia', body);
+    print("Estoy en response " + response.body);
+    return response;
+  }
+
   Future<dynamic> getFeedPubs() async {
     final http.Response response = await _helper.get('/Feed/getAllFeeds');
     return response;
   }
 
+  Future<dynamic> getSugerenciaPubs() async {
+    final http.Response response =
+        await _helper.get('/Sugerencia/getAllSugerencias');
+    return response;
+  }
+
   Future<dynamic> deleteFeedPost(String id) async {
     final http.Response response = await _helper.delete('/Feed/deleteFeed/$id');
+    print('Response: ' + response.body);
+    return response;
+  }
+
+  Future<dynamic> deleteSugerenciaPost(String id) async {
+    final http.Response response =
+        await _helper.delete('/Sugerencia/deleteSugerencia/$id');
     print('Response: ' + response.body);
     return response;
   }

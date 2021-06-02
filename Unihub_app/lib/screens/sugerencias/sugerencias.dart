@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:unihub_app/controllers/feed_controller.dart';
 import 'package:unihub_app/models/feedPublication.dart';
+import 'package:unihub_app/models/sugerencia.dart';
 import 'package:unihub_app/screens/addOffer/addOffer.dart';
 import 'package:unihub_app/widgets/feedPostSection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:unihub_app/widgets/sugerenciaPostSection.dart';
 
 class SugerenciasScreen extends StatefulWidget {
   Sugerencias createState() => Sugerencias();
@@ -13,7 +15,7 @@ class SugerenciasScreen extends StatefulWidget {
 
 class Sugerencias extends State<SugerenciasScreen> {
   String username;
-  List<FeedPublication> pubsList;
+  List<SugerenciaPublication> pubsList;
 
   @override
   void initState() {
@@ -32,19 +34,19 @@ class Sugerencias extends State<SugerenciasScreen> {
 
   final TextEditingController contentController = TextEditingController();
 
-  Future<List<FeedPublication>> getAllFeeds() async {
-    http.Response response = await FeedController().getFeedPubs();
-    List<FeedPublication> preFeedList = [];
-    for (var feedPub in jsonDecode(response.body)) {
-      preFeedList.add(FeedPublication.fromMap(feedPub));
+  Future<List<SugerenciaPublication>> getAllSugerencias() async {
+    http.Response response = await FeedController().getSugerenciaPubs();
+    List<SugerenciaPublication> preSugerenciaList = [];
+    for (var sugerenciaPub in jsonDecode(response.body)) {
+      preSugerenciaList.add(SugerenciaPublication.fromMap(sugerenciaPub));
     }
-    return preFeedList;
+    return preSugerenciaList;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<FeedPublication>>(
-      future: getAllFeeds(),
+    return FutureBuilder<List<SugerenciaPublication>>(
+      future: getAllSugerencias(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Scaffold(
@@ -58,11 +60,11 @@ class Sugerencias extends State<SugerenciasScreen> {
                       itemBuilder: (context, index) {
                         if (snapshot.data.reversed.elementAt(index).username ==
                             this.username) {
-                          this.pubsList = new List<FeedPublication>.from(
+                          this.pubsList = new List<SugerenciaPublication>.from(
                               snapshot.data.reversed);
                           return new Dismissible(
                               key: ObjectKey(this.pubsList.elementAt(index)),
-                              child: new FeedPost(
+                              child: new SugerenciaPost(
                                   this.pubsList.elementAt(index).id,
                                   this.pubsList.elementAt(index).username,
                                   this.pubsList.elementAt(index).content,
@@ -84,7 +86,7 @@ class Sugerencias extends State<SugerenciasScreen> {
                               },
                               onDismissed: (direction) {});
                         } else {
-                          return new FeedPost(
+                          return new SugerenciaPost(
                               snapshot.data.reversed.elementAt(index).id,
                               snapshot.data.reversed.elementAt(index).username,
                               snapshot.data.reversed.elementAt(index).content,
@@ -137,14 +139,14 @@ class Sugerencias extends State<SugerenciasScreen> {
         child: Text("Añadir Sugerencia"),
         onPressed: () async {
           //Submit post
-          http.Response response = await FeedController().createFeedPub(
+          http.Response response = await FeedController().createSugerenciaPub(
               this.username, contentController.text, DateTime.now().toString());
           if (response.statusCode == 200) {
             createToast('Sugerencia añadida correctamente', Colors.green);
             setState(() {
               print(jsonDecode(response.body));
               pubsList.insert(
-                  0, FeedPublication.fromMap(jsonDecode(response.body)));
+                  0, SugerenciaPublication.fromMap(jsonDecode(response.body)));
             });
             Navigator.pop(context);
           }
@@ -188,7 +190,7 @@ class Sugerencias extends State<SugerenciasScreen> {
       onPressed: () async {
         //delete post
         await FeedController()
-            .deleteFeedPost(this.pubsList.elementAt(index).id)
+            .deleteSugerenciaPost(this.pubsList.elementAt(index).id)
             .whenComplete(() {
           setState(() {
             this.pubsList.removeAt(index);
