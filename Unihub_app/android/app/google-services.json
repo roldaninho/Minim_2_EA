@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "894277061517",
+    "project_id": "unihub-76deb",
+    "storage_bucket": "unihub-76deb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894277061517:android:9f688cbabd79cf87a48bc4",
+        "android_client_info": {
+          "package_name": "com.example.unihub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "894277061517-d9lsohlkgtep8u9jpc7f0id9ckvit3vm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxk8htdKperZJrXXKzPI8SCTICoOCMGZ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "894277061517-d9lsohlkgtep8u9jpc7f0id9ckvit3vm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

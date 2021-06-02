@@ -1,0 +1,22 @@
+
+<h1 style="text-align: center">Users</h1>
+<div id="container">
+  <div class="column-list">
+    <div class="margin-sides">
+      <p>Users</p>
+      <mat-card class="mat-card-list">
+        <mat-list role="list">
+          <mat-list-item *ngFor="let user of users"
+                         class="no-pad list-item"
+                         role="listitem">
+              <div *ngIf='!user.isAdmin' class="text">
+                <h5>{{user.username}}</h5>
+              </div>
+              <div *ngIf='!user.isAdmin' class="spacer"></div>
+              <button *ngIf='!user.isAdmin' class="userDeleteButton" type="button" id="userDeleteButton" (click)="deleteUser(user.username)">Delete User</button>
+          </mat-list-item>
+        </mat-list>
+      </mat-card>
+    </div>
+  </div>
+</div>
